@@ -52,6 +52,14 @@ export default {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
 				},
+				dream: {
+					primary: '#4285F4',    // Blue for buttons
+					secondary: '#F87171',  // Red for recording button
+					accent: '#9b87f5',     // Purple accent
+					dark: '#1A1F2C',       // Dark background
+					gray: '#8E9196',       // Neutral gray
+					light: '#F1F0FB',      // Light background
+				},
 				sidebar: {
 					DEFAULT: 'hsl(var(--sidebar-background))',
 					foreground: 'hsl(var(--sidebar-foreground))',
