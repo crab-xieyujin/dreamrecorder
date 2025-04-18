@@ -1,4 +1,3 @@
-
 export interface Recording {
   id: string;
   audio: Blob | null; 
@@ -19,4 +18,14 @@ export interface Dream {
   recordings: Recording[];
   prompt: DreamPrompt | null;
   savedImages: string[];
+}
+
+export interface CommunityPost {
+  id: string;
+  userId: string;
+  username: string;
+  content: string;
+  imageUrl: string;
+  likes: number;
+  timestamp: Date;
 }
