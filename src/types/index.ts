@@ -29,3 +29,20 @@ export interface CommunityPost {
   likes: number;
   timestamp: Date;
 }
+
+export interface Message {
+  id: string;
+  sender: string;
+  avatar?: string;
+  content: string;
+  timestamp: string;
+  type: 'like' | 'comment' | 'system';
+  dreamTitle?: string;
+}
+
+export interface UserProfile {
+  id: string;
+  nickname: string;
+  avatar: string;
+  dreams: Dream[];
+}
