@@ -24,7 +24,7 @@ const mockMessages: Message[] = [
   {
     id: "3",
     sender: "系统消息",
-    content: "恭喜你激活了"白日梦"体验卷",
+    content: "恭喜你激活了\"白日梦\"体验卷",
     timestamp: "02-11",
     type: "system"
   }
