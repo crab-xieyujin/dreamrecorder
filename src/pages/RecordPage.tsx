@@ -8,7 +8,7 @@ import { RecordButton } from "@/components/RecordButton";
 import { RecordingList } from "@/components/RecordingList";
 import { PromptEditor } from "@/components/PromptEditor";
 import { DreamGenerator } from "@/components/DreamGenerator";
-import { ArrowLeft, MoreHorizontal, Camera } from "lucide-react";
+import { ArrowLeft, MoreHorizontal, Camera, Brush, Edit2 } from "lucide-react";
 
 enum RecordingStage {
   INITIAL = "initial",
@@ -35,15 +35,6 @@ export default function RecordPage() {
   const [recordingStage, setRecordingStage] = useState<RecordingStage>(
     currentRecordings.length > 0 ? RecordingStage.RECORDED : RecordingStage.INITIAL
   );
-
-  // Check if we already have a generated dream
-  useState(() => {
-    if (currentPrompt && currentPrompt.images.length > 0) {
-      setRecordingStage(RecordingStage.GENERATED);
-    } else if (currentPrompt) {
-      setRecordingStage(RecordingStage.PROMPT_EDITING);
-    }
-  });
 
   // Initialize recorder
   const { 
@@ -87,25 +78,25 @@ export default function RecordPage() {
     setRecordingStage(RecordingStage.PROMPT_EDITING);
   };
 
+  const handlePromptEdit = () => {
+    setRecordingStage(RecordingStage.PROMPT_EDITING);
+  };
+
   const handlePromptConfirm = async (promptText: string) => {
     setCurrentPrompt({
       text: promptText,
       images: []
     });
-    
-    setRecordingStage(RecordingStage.GENERATING);
-    setIsProcessing(true);
-    
-    // Generate images
-    await regenerateImages();
-    
-    setIsProcessing(false);
-    setRecordingStage(RecordingStage.GENERATED);
+    setRecordingStage(RecordingStage.RECORDED);
   };
 
-  const handleSaveDream = () => {
-    saveDream();
-    navigate('/');
+  const handleProceedToDrawing = () => {
+    setRecordingStage(RecordingStage.GENERATING);
+    setIsProcessing(true);
+    regenerateImages().then(() => {
+      setIsProcessing(false);
+      setRecordingStage(RecordingStage.GENERATED);
+    });
   };
 
   const getPageTitle = () => {
@@ -135,16 +126,10 @@ export default function RecordPage() {
           </button>
           <h1 className="text-lg font-medium">{getPageTitle()}</h1>
           <div className="flex">
-            <button
-              className="p-1 ml-2"
-              aria-label="More options"
-            >
+            <button className="p-1 ml-2" aria-label="More options">
               <MoreHorizontal size={24} />
             </button>
-            <button
-              className="p-1 ml-2"
-              aria-label="Camera"
-            >
+            <button className="p-1 ml-2" aria-label="Camera">
               <Camera size={24} />
             </button>
           </div>
@@ -157,8 +142,43 @@ export default function RecordPage() {
           <PromptEditor
             initialPrompt={currentPrompt.text}
             onConfirm={handlePromptConfirm}
-            isEditable={false}
+            isEditable={true}
+            onCancel={() => setRecordingStage(RecordingStage.RECORDED)}
           />
+        )}
+
+        {(recordingStage === RecordingStage.INITIAL || 
+          recordingStage === RecordingStage.RECORDING || 
+          recordingStage === RecordingStage.RECORDED) && (
+          <>
+            <RecordingList
+              recordings={currentRecordings}
+              onGenerateDream={
+                currentRecordings.length > 0 ? handleGenerateDream : undefined
+              }
+            />
+            
+            {currentPrompt && recordingStage === RecordingStage.RECORDED && (
+              <div className="fixed bottom-32 left-0 right-0 px-4">
+                <div className="flex space-x-4">
+                  <button
+                    onClick={handleProceedToDrawing}
+                    className="flex-1 flex items-center justify-center py-3 px-4 bg-dream-primary text-white rounded-lg"
+                  >
+                    <Brush className="w-5 h-5 mr-2" />
+                    绘制
+                  </button>
+                  <button
+                    onClick={handlePromptEdit}
+                    className="flex-1 flex items-center justify-center py-3 px-4 border border-gray-300 rounded-lg"
+                  >
+                    <Edit2 className="w-5 h-5 mr-2" />
+                    修改
+                  </button>
+                </div>
+              </div>
+            )}
+          </>
         )}
 
         {recordingStage === RecordingStage.GENERATED && currentPrompt && (
@@ -168,17 +188,6 @@ export default function RecordPage() {
             isLoading={isProcessing}
             onRegenerate={regenerateImages}
             onSave={handleSaveDream}
-          />
-        )}
-
-        {(recordingStage === RecordingStage.INITIAL || 
-          recordingStage === RecordingStage.RECORDING || 
-          recordingStage === RecordingStage.RECORDED) && (
-          <RecordingList
-            recordings={currentRecordings}
-            onGenerateDream={
-              currentRecordings.length > 0 ? handleGenerateDream : undefined
-            }
           />
         )}
 
