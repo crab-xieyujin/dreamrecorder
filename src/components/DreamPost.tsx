@@ -1,16 +1,22 @@
-
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Heart } from "lucide-react";
 import { CommunityPost } from "@/types";
+import { useNavigate } from "react-router-dom";
 
 interface DreamPostProps {
   post: CommunityPost;
 }
 
 export function DreamPost({ post }: DreamPostProps) {
+  const navigate = useNavigate();
+
+  const handleClick = () => {
+    navigate(`/community/dream/${post.id}`);
+  };
+
   return (
-    <Card className="mb-4">
+    <Card className="mb-4 cursor-pointer" onClick={handleClick}>
       <CardContent className="p-0">
         <img 
           src={post.imageUrl} 
