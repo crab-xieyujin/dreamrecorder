@@ -1,9 +1,12 @@
 
+import { useState } from "react";
 import { ChevronLeft, MoreVertical, MessageSquare, ThumbsUp } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { CommentSection } from "@/components/CommentSection";
+import { useToast } from "@/hooks/use-toast";
 
 const mockDreamDetail = {
   id: "1",
@@ -18,6 +21,43 @@ const mockDreamDetail = {
 
 export default function DreamDetailPage() {
   const navigate = useNavigate();
+  const { toast } = useToast();
+  const [isLiked, setIsLiked] = useState(false);
+  const [likesCount, setLikesCount] = useState(mockDreamDetail.likes);
+  const [comments, setComments] = useState<Array<{
+    id: string;
+    author: string;
+    content: string;
+    timestamp: string;
+  }>>([]);
+
+  const handleLike = () => {
+    if (isLiked) {
+      setLikesCount(prev => prev - 1);
+      toast({
+        description: "已取消点赞",
+      });
+    } else {
+      setLikesCount(prev => prev + 1);
+      toast({
+        description: "点赞成功",
+      });
+    }
+    setIsLiked(!isLiked);
+  };
+
+  const handleComment = (content: string) => {
+    const newComment = {
+      id: Date.now().toString(),
+      author: "我",
+      content,
+      timestamp: new Date().toLocaleTimeString()
+    };
+    setComments(prev => [newComment, ...prev]);
+    toast({
+      description: "评论成功",
+    });
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 pb-16">
@@ -59,15 +99,24 @@ export default function DreamDetailPage() {
               <p className="text-gray-600">{mockDreamDetail.analysis}</p>
             </div>
 
-            <div className="flex justify-between items-center border-t pt-4">
-              <Button variant="outline" className="flex-1 mr-2" onClick={() => {}}>
+            <div className="flex justify-between items-center border-t pt-4 mb-6">
+              <Button 
+                variant="outline" 
+                className={`flex-1 mr-2 ${isLiked ? "bg-red-50 text-red-500 hover:bg-red-100" : ""}`}
+                onClick={handleLike}
+              >
                 <ThumbsUp className="mr-2 h-4 w-4" />
-                点赞 {mockDreamDetail.likes}
+                点赞 {likesCount}
               </Button>
-              <Button variant="outline" className="flex-1 ml-2" onClick={() => {}}>
+              <Button variant="outline" className="flex-1 ml-2">
                 <MessageSquare className="mr-2 h-4 w-4" />
                 评论
               </Button>
+            </div>
+
+            <div className="border-t pt-6">
+              <h3 className="text-lg font-semibold mb-4">评论区</h3>
+              <CommentSection comments={comments} onSubmit={handleComment} />
             </div>
           </div>
         </div>
