@@ -1,9 +1,12 @@
 
+import { useState } from "react";
 import { ChevronLeft, MoreVertical, Pencil } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Dream } from "@/types";
+import { EditNicknameDialog } from "@/components/EditNicknameDialog";
+import { cn } from "@/lib/utils";
 
 const mockDreams: Dream[] = [
   {
@@ -28,8 +31,30 @@ const mockDreams: Dream[] = [
   }
 ];
 
+const mockLikedDreams: Dream[] = [
+  {
+    id: "3",
+    date: new Date("2024-03-10"),
+    recordings: [],
+    prompt: {
+      text: "在月球上建造了一座玻璃城堡，可以看到地球的全貌",
+      images: ["https://images.unsplash.com/photo-1451187580459-43490279c0fa"]
+    },
+    savedImages: ["https://images.unsplash.com/photo-1451187580459-43490279c0fa"]
+  }
+];
+
 export default function ProfilePage() {
   const navigate = useNavigate();
+  const [nickname, setNickname] = useState("火山爆发的前兆");
+  const [showEditDialog, setShowEditDialog] = useState(false);
+  const [activeTab, setActiveTab] = useState<"dreams" | "likes">("dreams");
+  
+  const displayedDreams = activeTab === "dreams" ? mockDreams : mockLikedDreams;
+
+  const handleSaveNickname = (newNickname: string) => {
+    setNickname(newNickname);
+  };
 
   return (
     <div className="min-h-screen bg-white pb-16">
@@ -54,8 +79,8 @@ export default function ProfilePage() {
             </Avatar>
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-lg font-semibold">火山爆发的前兆</h2>
-                <button>
+                <h2 className="text-lg font-semibold">{nickname}</h2>
+                <button onClick={() => setShowEditDialog(true)}>
                   <Pencil className="h-4 w-4 text-gray-400" />
                 </button>
               </div>
@@ -65,12 +90,28 @@ export default function ProfilePage() {
         </div>
 
         <div className="flex gap-6 mb-6 border-b pb-4">
-          <button className="text-gray-600">点赞</button>
-          <button className="text-blue-500 border-b-2 border-blue-500">梦境</button>
+          <button 
+            className={cn(
+              "text-gray-600",
+              activeTab === "likes" && "text-blue-500 border-b-2 border-blue-500"
+            )}
+            onClick={() => setActiveTab("likes")}
+          >
+            点赞
+          </button>
+          <button 
+            className={cn(
+              "text-gray-600",
+              activeTab === "dreams" && "text-blue-500 border-b-2 border-blue-500"
+            )}
+            onClick={() => setActiveTab("dreams")}
+          >
+            梦境
+          </button>
         </div>
 
         <ScrollArea className="h-[calc(100vh-250px)]">
-          {mockDreams.map((dream) => (
+          {displayedDreams.map((dream) => (
             <div key={dream.id} className="mb-8">
               <div className="flex items-center gap-2 mb-4">
                 <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
@@ -80,7 +121,7 @@ export default function ProfilePage() {
               </div>
               <div className="flex justify-between items-start gap-4">
                 <div className="flex-1">
-                  <h3 className="font-medium mb-2">帝王梦</h3>
+                  <h3 className="font-medium mb-2">梦境记录</h3>
                   <p className="text-sm text-gray-600 line-clamp-2">
                     {dream.prompt?.text}
                   </p>
@@ -97,6 +138,13 @@ export default function ProfilePage() {
           ))}
         </ScrollArea>
       </div>
+
+      <EditNicknameDialog
+        open={showEditDialog}
+        onOpenChange={setShowEditDialog}
+        currentNickname={nickname}
+        onSave={handleSaveNickname}
+      />
     </div>
   );
 }
