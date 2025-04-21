@@ -1,9 +1,8 @@
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDream } from "@/context/DreamContext";
-import { useAudioRecorder } from "@/hooks/useAudioRecorder";
 import { Recording, DreamPrompt } from "@/types";
-import { RecordButton } from "@/components/RecordButton";
 import { RecordingList } from "@/components/RecordingList";
 import { PromptEditor } from "@/components/PromptEditor";
 import { DreamGenerator } from "@/components/DreamGenerator";
@@ -24,51 +23,32 @@ export default function RecordPage() {
   const { toast } = useToast();
   const { 
     currentRecordings, 
-    addRecording, 
     currentPrompt, 
     setCurrentPrompt,
     regenerateImages,
     isProcessing,
     setIsProcessing,
-    saveDream,
-    startNewDream
+    saveDream
   } = useDream();
+  
   const [recordingStage, setRecordingStage] = useState<RecordingStage>(
     currentRecordings.length > 0 ? RecordingStage.RECORDED : RecordingStage.INITIAL
   );
 
-  // Initialize recorder
-  const { 
-    isRecording, 
-    recordingDuration,
-    startRecording, 
-    stopRecording 
-  } = useAudioRecorder({
-    onRecordingComplete: (recording) => {
-      addRecording(recording);
+  // 当录音列表变化时更新状态
+  useEffect(() => {
+    if (currentRecordings.length > 0) {
       setRecordingStage(RecordingStage.RECORDED);
     }
-  });
-
-  const handleRecordStart = () => {
-    if (!currentRecordings.length) {
-      startNewDream();
-    }
-    setRecordingStage(RecordingStage.RECORDING);
-    startRecording();
-  };
-
-  const handleRecordStop = () => {
-    stopRecording();
-  };
+  }, [currentRecordings]);
 
   const handleGenerateDream = () => {
-    // Combine all transcriptions
+    // 组合所有转录
     const combinedText = currentRecordings
       .map(recording => recording.text)
       .join(' ');
     
-    // Mock AI prompt enhancement
+    // 模拟AI提示增强
     const enhancedPrompt = `晨光中的森林小径，粗壮的树干形成天然拱门，阳光透过树叶洒下光斑，8K超清写实风格，嫩绿草地与深褐树皮形成色彩对比，低视角拍摄增强空间纵深感`;
     
     setCurrentPrompt({
@@ -100,7 +80,7 @@ export default function RecordPage() {
     });
   };
 
-  // Add the missing function to handle saving the dream
+  // 处理保存梦境的函数
   const handleSaveDream = () => {
     saveDream();
     toast({
@@ -202,10 +182,11 @@ export default function RecordPage() {
           />
         )}
 
-        {/* Empty state */}
+        {/* 空状态提示 */}
         {recordingStage === RecordingStage.INITIAL && currentRecordings.length === 0 && (
           <div className="flex flex-col items-center justify-center h-[70vh] text-gray-500">
-            <p className="mb-4">松开结束录音并转文字</p>
+            <p className="mb-4">长按底部"记录"按钮开始录音</p>
+            <p>松开结束录音并转文字</p>
           </div>
         )}
       </main>
