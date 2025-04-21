@@ -106,7 +106,7 @@ export default function RecordPage() {
     saveDream();
     toast({
       title: "梦境保存成功",
-      description: "你可以在"梦境"页面查看你的梦境记录",
+      description: "你可以在\"梦境\"页面查看你的梦境记录",
     });
     navigate('/');
   };
