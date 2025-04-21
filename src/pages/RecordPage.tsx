@@ -9,6 +9,7 @@ import { RecordingList } from "@/components/RecordingList";
 import { PromptEditor } from "@/components/PromptEditor";
 import { DreamGenerator } from "@/components/DreamGenerator";
 import { ArrowLeft, MoreHorizontal, Camera, Brush, Edit2 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 enum RecordingStage {
   INITIAL = "initial",
@@ -21,6 +22,7 @@ enum RecordingStage {
 
 export default function RecordPage() {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const { 
     currentRecordings, 
     addRecording, 
@@ -97,6 +99,16 @@ export default function RecordPage() {
       setIsProcessing(false);
       setRecordingStage(RecordingStage.GENERATED);
     });
+  };
+
+  // Add the missing function to handle saving the dream
+  const handleSaveDream = () => {
+    saveDream();
+    toast({
+      title: "梦境保存成功",
+      description: "你可以在"梦境"页面查看你的梦境记录",
+    });
+    navigate('/');
   };
 
   const getPageTitle = () => {
