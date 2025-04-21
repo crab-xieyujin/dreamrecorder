@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDream } from "@/context/DreamContext";
@@ -210,19 +209,6 @@ export default function RecordPage() {
           </div>
         )}
       </main>
-
-      {/* Footer with Record Button */}
-      {(recordingStage === RecordingStage.INITIAL || 
-        recordingStage === RecordingStage.RECORDING || 
-        recordingStage === RecordingStage.RECORDED) && (
-        <div className="fixed bottom-16 left-0 right-0 flex justify-center py-4">
-          <RecordButton
-            isRecording={isRecording}
-            onRecordStart={handleRecordStart}
-            onRecordStop={handleRecordStop}
-          />
-        </div>
-      )}
     </div>
   );
 }
